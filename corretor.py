@@ -1,10 +1,10 @@
+from statistics import mean
 import glob
 import cv2
 import numpy as np
 import utils
-from statistics import mean
 
-debugar = False
+DEBUGAR = False
 gabarito = ["a", "b", "c", "d", "e", "a", "b", "c", "d", "e"]
 
 
@@ -57,7 +57,7 @@ def corrigir(nome_do_arquivo):
         for indice_coluna, coluna in enumerate(img_colunas):
             numero_de_pixels_brancos = cv2.countNonZero(coluna)
             numero_pixels_na_coluna.append(numero_de_pixels_brancos)
-            if (debugar):
+            if (DEBUGAR):
                 cv2.imshow("imagem_circulo"+str(indice_linha) +
                            "_" + str(indice_coluna)+"_"+str(numero_de_pixels_brancos), coluna)
         numero_pixels_na_coluna_sem_maior = numero_pixels_na_coluna.copy()
@@ -74,7 +74,7 @@ def corrigir(nome_do_arquivo):
         if (len(gabarito) == NUMERO_QUESTOES and indice_marcado == utils.obter_indice_da_alternativa(gabarito[indice_linha])):
             pontuacao += 1
 
-    if debugar:
+    if DEBUGAR:
         # Imagem binária deve ter o retângulo das questões bem destacado e as opções marcadas também
         # Nos contornos o retângulo das questões deve ser o maior retângulo destacado da imagem
         copia_contornos = img.copy()
