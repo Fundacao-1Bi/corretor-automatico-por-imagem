@@ -7,7 +7,7 @@ def remover_sombra(img):
     planos_normalizados = []
     for plano in planos_rgb:
         img_dilatada = cv2.dilate(plano, np.ones((7, 7), np.uint8))
-        img_fundo = cv2.medianBlur(img_dilatada, 31)
+        img_fundo = cv2.medianBlur(img_dilatada, 41)
         diff_img = 255 - cv2.absdiff(plano, img_fundo)
         norm_img = cv2.normalize(
             diff_img, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8UC1)

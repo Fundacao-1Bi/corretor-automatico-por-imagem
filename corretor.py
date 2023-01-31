@@ -5,8 +5,6 @@ import utils
 from statistics import mean
 
 debugar = False
-NUMERO_QUESTOES = 10
-NUMERO_ALTERNATIVAS = 5
 gabarito = ["a", "b", "c", "d", "e", "a", "b", "c", "d", "e"]
 
 
@@ -39,13 +37,13 @@ def corrigir(nome_do_arquivo):
 
     vertices_float_32 = np.float32(vertices_ordenadas)
     template_formato_retangulo = np.float32(
-        [[0, 0], [1339, 0], [0, 1936], [1339, 1936]])  # shape conhecido do retangulo em pixels
+        [[0, 0], [267*NUMERO_ALTERNATIVAS, 0], [0, 193*NUMERO_QUESTOES], [267*NUMERO_ALTERNATIVAS, 193*NUMERO_QUESTOES]])  # shape conhecido do retangulo em pixels
     matriz_de_transformacao = cv2.getPerspectiveTransform(
         vertices_float_32, template_formato_retangulo)
     img_corrigida = cv2.warpPerspective(
-        imagem_binaria, matriz_de_transformacao, (1339, 1936))
+        imagem_binaria, matriz_de_transformacao, (267*NUMERO_ALTERNATIVAS, 193*NUMERO_QUESTOES))
     img_bordas_cortadas = utils.cortar_imagem(
-        img_corrigida, 0.93)  # corta 7% das bordas e mantém 93% da imagem
+        img_corrigida, 0.94)  # corta 6% das bordas e mantém 94% da imagem
 
     img_linhas = utils.fatiar_vertical(img_bordas_cortadas, NUMERO_QUESTOES)
 
@@ -62,9 +60,11 @@ def corrigir(nome_do_arquivo):
             if (debugar):
                 cv2.imshow("imagem_circulo"+str(indice_linha) +
                            "_" + str(indice_coluna)+"_"+str(numero_de_pixels_brancos), coluna)
-        media_de_pixels = mean(numero_pixels_na_coluna)
+        numero_pixels_na_coluna_sem_maior = numero_pixels_na_coluna.copy()
+        numero_pixels_na_coluna_sem_maior.remove(max(numero_pixels_na_coluna))
+        media_de_pixels = mean(numero_pixels_na_coluna_sem_maior)
         for indice_pixels, pixels in enumerate(numero_pixels_na_coluna):
-            if (pixels > maior_pixels and pixels > media_de_pixels*1.2):
+            if (pixels > maior_pixels and pixels > media_de_pixels*(1.2+0.01*NUMERO_ALTERNATIVAS)):
                 maior_pixels = pixels
                 indice_marcado = indice_pixels
 
@@ -91,7 +91,21 @@ def corrigir(nome_do_arquivo):
     return respostas, pontuacao
 
 
+# Experiência padrão de gabarito, configurar NUMERO_QUESTOES = 10 e NUMERO_ALTERNATIVAS = 5
+NUMERO_QUESTOES = 10
+NUMERO_ALTERNATIVAS = 5
 arquivos_a_serem_corrigidos = glob.glob("gabaritos/*")
+
+# Experiência de diagnóstico com 7 linhas, configurar NUMERO_QUESTOES = 7 e NUMERO_ALTERNATIVAS = 3
+# NUMERO_QUESTOES = 7
+# NUMERO_ALTERNATIVAS = 3
+# arquivos_a_serem_corrigidos = glob.glob("diagnosticos/7*")
+
+# Experiência de diagnóstico com 14 linhas, configurar NUMERO_QUESTOES = 7 e NUMERO_ALTERNATIVAS = 3
+# NUMERO_QUESTOES = 14
+# NUMERO_ALTERNATIVAS = 3
+# arquivos_a_serem_corrigidos = glob.glob("diagnosticos/14*")
+
 for arquivo in arquivos_a_serem_corrigidos:
     respostas, pontuacao = corrigir(arquivo)
     nome_do_estudante = arquivo.replace(
