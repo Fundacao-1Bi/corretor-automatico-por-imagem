@@ -17,7 +17,7 @@ def corrigir(nome_do_arquivo):
     # Pre Processamentos
     imagem_sem_sombra = utils.remover_sombra(img)
     imagem_cinza = cv2.cvtColor(imagem_sem_sombra, cv2.COLOR_BGR2GRAY)
-    imagem_com_desfoque = cv2.GaussianBlur(imagem_cinza, (11, 11), 16)
+    imagem_com_desfoque = cv2.GaussianBlur(imagem_cinza, (5, 5), 8)
     imagem_binaria = cv2.threshold(
         imagem_com_desfoque, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
 
@@ -43,7 +43,7 @@ def corrigir(nome_do_arquivo):
     img_corrigida = cv2.warpPerspective(
         imagem_binaria, matriz_de_transformacao, (267*NUMERO_ALTERNATIVAS, 193*NUMERO_QUESTOES))
     img_bordas_cortadas = utils.cortar_imagem(
-        img_corrigida, 0.94)  # corta 6% das bordas e mantém 94% da imagem
+        img_corrigida, 0.96)  # corta 6% das bordas e mantém 94% da imagem
 
     img_linhas = utils.fatiar_vertical(img_bordas_cortadas, NUMERO_QUESTOES)
 
@@ -64,7 +64,7 @@ def corrigir(nome_do_arquivo):
         numero_pixels_na_coluna_sem_maior.remove(max(numero_pixels_na_coluna))
         media_de_pixels = mean(numero_pixels_na_coluna_sem_maior)
         for indice_pixels, pixels in enumerate(numero_pixels_na_coluna):
-            if (pixels > maior_pixels and pixels > media_de_pixels*(1.2+0.01*NUMERO_ALTERNATIVAS)):
+            if (pixels > maior_pixels and pixels > media_de_pixels*(1.1+0.03*NUMERO_ALTERNATIVAS)):
                 maior_pixels = pixels
                 indice_marcado = indice_pixels
 
@@ -105,6 +105,11 @@ arquivos_a_serem_corrigidos = glob.glob("gabaritos/*")
 # NUMERO_QUESTOES = 14
 # NUMERO_ALTERNATIVAS = 3
 # arquivos_a_serem_corrigidos = glob.glob("diagnosticos/14*")
+
+
+# NUMERO_QUESTOES = 25
+# NUMERO_ALTERNATIVAS = 3
+# arquivos_a_serem_corrigidos = glob.glob("diagnosticos/25*")
 
 for arquivo in arquivos_a_serem_corrigidos:
     respostas, pontuacao = corrigir(arquivo)
