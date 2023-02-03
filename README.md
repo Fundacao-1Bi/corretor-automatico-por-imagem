@@ -1,4 +1,4 @@
-# Corretor de Gabaritos de gabaritos Automatizado por Imagem
+# Corretor automatizado de gabaritos através de análise de imagem
 
 Tire uma foto do gabarito de cada estudante e obtenha a correção de maneira automática
 
