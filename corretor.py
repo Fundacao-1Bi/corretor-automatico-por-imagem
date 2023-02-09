@@ -17,7 +17,7 @@ def corrigir(nome_do_arquivo):
     # Pre Processamentos
     imagem_sem_sombra = utils.remover_sombra(img)
     imagem_cinza = cv2.cvtColor(imagem_sem_sombra, cv2.COLOR_BGR2GRAY)
-    imagem_com_desfoque = cv2.GaussianBlur(imagem_cinza, (5, 5), 8)
+    imagem_com_desfoque = cv2.GaussianBlur(imagem_cinza, (3, 3), 5)
     imagem_binaria = cv2.threshold(
         imagem_com_desfoque, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
 
@@ -36,6 +36,9 @@ def corrigir(nome_do_arquivo):
     # Corrige perspectiva da Imagem
 
     vertices_float_32 = np.float32(vertices_ordenadas)
+    # pinta a borda de preto para remover-la da área de interesse
+    cv2.drawContours(imagem_binaria, [maior_retangulo], -1, (0, 0, 0), 16)
+
     template_formato_retangulo = np.float32(
         [[0, 0], [267*NUMERO_ALTERNATIVAS, 0], [0, 193*NUMERO_QUESTOES], [267*NUMERO_ALTERNATIVAS, 193*NUMERO_QUESTOES]])  # shape conhecido do retangulo em pixels
     matriz_de_transformacao = cv2.getPerspectiveTransform(
@@ -43,7 +46,7 @@ def corrigir(nome_do_arquivo):
     img_corrigida = cv2.warpPerspective(
         imagem_binaria, matriz_de_transformacao, (267*NUMERO_ALTERNATIVAS, 193*NUMERO_QUESTOES))
     img_bordas_cortadas = utils.cortar_imagem(
-        img_corrigida, 0.96)  # corta 6% das bordas e mantém 94% da imagem
+        img_corrigida, 0.99)  # corta 6% das bordas e mantém 94% da imagem
 
     img_linhas = utils.fatiar_vertical(img_bordas_cortadas, NUMERO_QUESTOES)
 
@@ -55,6 +58,7 @@ def corrigir(nome_do_arquivo):
         img_colunas = utils.fatiar_horizontal(linha, NUMERO_ALTERNATIVAS)
         numero_pixels_na_coluna = []
         for indice_coluna, coluna in enumerate(img_colunas):
+            coluna = utils.cortar_imagem(coluna, 0.90)
             numero_de_pixels_brancos = cv2.countNonZero(coluna)
             numero_pixels_na_coluna.append(numero_de_pixels_brancos)
             if (DEBUGAR):
