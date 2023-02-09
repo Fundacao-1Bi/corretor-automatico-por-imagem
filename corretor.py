@@ -46,7 +46,7 @@ def corrigir(nome_do_arquivo):
     img_corrigida = cv2.warpPerspective(
         imagem_binaria, matriz_de_transformacao, (267*NUMERO_ALTERNATIVAS, 193*NUMERO_QUESTOES))
     img_bordas_cortadas = utils.cortar_imagem(
-        img_corrigida, 0.99)  # corta 6% das bordas e mantém 94% da imagem
+        img_corrigida, 0.99)  # corta 1% das bordas e mantém 99% da imagem
 
     img_linhas = utils.fatiar_vertical(img_bordas_cortadas, NUMERO_QUESTOES)
 
